@@ -94,7 +94,7 @@ const getBestCourseFromDB = async() => {
 
   // getting course id of highest review
   let maxCount = 0; 
-  let courseId : string; 
+  let courseId : string = ''; 
   for (let i = 0; i < reviewIdArr.length; i++) { 
       let count = 0; 
       for (let j = 0; j < reviewIdArr.length; j++) { 
