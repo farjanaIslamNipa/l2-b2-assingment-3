@@ -5,7 +5,7 @@ const handleCastError = (err: mongoose.Error.CastError): TGenericErrorResponse =
 
   const errorDetails: TErrorDetails = {
     stringValue: (err?.stringValue)?.replace(/"/g, ''),
-    valueType: err?.valueType,
+    valueType: 'string',
     kind: err?.kind,
     value: err?.value,
     path: err?.path,
