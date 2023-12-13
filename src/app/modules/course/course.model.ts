@@ -1,10 +1,10 @@
 import { Schema, model } from "mongoose";
-import { TCourse, TCourseReview, TDetails, TTags } from "./course.interface";
+import { TCourse, TDetails, TTags } from "./course.interface";
 
 const tagsSchema = new Schema<TTags>({
   name: {type: String, required: true},
   isDeleted: {type: Boolean, default: false}
-})
+},{_id: false})
 
 const detailsSchema = new Schema<TDetails>({
   level: {type: String, required: true},
@@ -19,25 +19,11 @@ const courseSchema = new Schema<TCourse>({
   tags: {type: [tagsSchema], required: true},
   startDate: {type: String, required: true},
   endDate: {type: String, required: true},
-  durationInWeeks: {type: Number, required: true},
   language: {type: String, required: true},
   provider: {type: String, required: true},
+  durationInWeeks: {type: Number, required: true},
   details: detailsSchema
-})
+},{timestamps: true})
 
 export const Course = model<TCourse>('Course', courseSchema)
-
-// const courseWithReviewSchema = new Schema<TCourseReview>({
-//   course: {
-//     type: Schema.Types.ObjectId,
-//     ref: 'Course',
-//     unique: true
-//   },
-//   reviews: [{
-//     type: Schema.Types.ObjectId,
-//     ref: 'Review'
-//   }]
-// })
-
-// export const courseWithReview = model<TCourseReview>('CourseReview', courseWithReviewSchema)
 

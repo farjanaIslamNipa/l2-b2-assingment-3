@@ -7,19 +7,13 @@ const app: Application = express();
 
 app.use(express.json());
 app.use(cors());
-
-// application routes
 app.use('/api', router);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!');
+  res.send('Welcome to level2 batch2 assignment3');
 });
 
 app.use(globalErrorHandler)
-
-//Not Found
 app.use(notFound)
-
-
 
 export default app;

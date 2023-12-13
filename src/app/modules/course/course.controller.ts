@@ -3,27 +3,35 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { CourseServices } from "./course.service";
 
+
+// CREATE COURSE
 const createCourse = catchAsync(async(req, res) => {
   const result = await CourseServices.createCourseIntoDB(req.body);
 
   sendResponse(res, {
     success: true,
-    statusCode: httpStatus.OK,
+    statusCode: 201,
     message: 'Course created successfully',
     data: result
   })
 })
 
-const getAllCourses = catchAsync(async(req, res) => {
-  const result = await CourseServices.getAllCoursesFromDB();
 
-  sendResponse(res, {
+// GET ALL COURSES
+const getAllCourses = catchAsync(async(req, res) => {
+  const {meta, courseData} = await CourseServices.getAllCoursesFromDB(req.query);
+
+  res.status(200).json({
     success: true,
     statusCode: httpStatus.OK,
     message: 'Courses retrieved successfully',
-    data: result
+    meta: meta,
+    data: courseData
   })
 })
+
+
+// GET SINGLE COURSE
 const getSingleCourse = catchAsync(async(req, res) => {
   const {courseId} = req.params
   const result = await CourseServices.getSingleCourseFromDB(courseId);
@@ -36,6 +44,8 @@ const getSingleCourse = catchAsync(async(req, res) => {
   })
 })
 
+
+// UPDATE COURSE
 const updateCourse = catchAsync(async(req, res) => {
   const { courseId } = req.params
   const result = await CourseServices.updateCourseIntoDB(courseId, req.body)
@@ -48,6 +58,8 @@ const updateCourse = catchAsync(async(req, res) => {
   })
 })
 
+
+// GET COURSE WITH REVIEWS
 const getCourseWithReviews = catchAsync(async(req, res) => {
   const {courseId} = req.params;
 
@@ -61,6 +73,8 @@ const getCourseWithReviews = catchAsync(async(req, res) => {
   })
 })
 
+
+// GET BEST COURSE
 const getBestCourse = catchAsync(async(req, res) => {
   const result = await CourseServices.getBestCourseFromDB();
 

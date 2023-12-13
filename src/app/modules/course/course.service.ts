@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { TReview } from "../review/review.interface";
+import httpStatus from "http-status";
+import { AppError } from "../../error/appError";
 import { Review } from "../review/review.model";
 import { TCourse } from "./course.interface";
 import { Course } from "./course.model";
+import mongoose from "mongoose";
 
 
 // CREATE COURSE
@@ -22,15 +24,80 @@ const createCourseIntoDB = async(payload:TCourse) => {
 
   return result;
 
-
 }
 
 
 // GET ALL COURSE
-const getAllCoursesFromDB = async() => {
+const getAllCoursesFromDB = async(query: Record<string, unknown>) => {
 
-  const result = await Course.find();
-  return result;
+  const queryObj = {...query}
+
+  const excludeFields = ['page', 'sortBy', 'sortOrder', 'limit', 'page', 'fields']
+
+  excludeFields.forEach(el => delete queryObj[el])
+
+  // FILTERING
+  const queryNames = Object.keys(queryObj);
+  // filtering by level
+  if(queryNames.includes('level')){
+    queryObj['details.level'] = queryObj['level'];
+    delete queryObj['level'];
+  }
+
+let filterQuery = Course.find(queryObj); 
+
+  if(query.minPrice && query.maxPrice){
+    filterQuery = filterQuery.find()
+  }
+
+  // SORTING
+  let sortBy = '-createdAt'
+  if(query.sortBy){
+    sortBy = query.sortBy as string
+  }
+
+  if(query.sortBy && query.sortOrder && query.sortOrder === 'asc'){
+    sortBy = query.sortBy as string
+  }
+  if(query.sortBy && query.sortOrder && query.sortOrder === 'desc'){
+    sortBy = `-${(query.sortBy as string)}`
+  }
+
+  const sortQuery = filterQuery.sort(sortBy);
+
+// LIMITING
+  let limit = 10
+  if(query.limit){
+    limit = Number(query.limit)
+  }
+
+  // PAGINATING
+  let page =1
+  let skip =0
+
+  if(query.page){
+    page = Number(query.page)
+    skip = (page - 1) * limit
+  }
+
+  const paginateQuery = sortQuery.skip(skip)
+
+  const limitQuery = paginateQuery.limit(limit);
+
+  let fields= '-__v';
+  if(query.fields){
+    fields = (query.fields as string).replace(',', ' ')
+  }
+
+  const fieldsQuery = await limitQuery.select(fields);
+
+  const meta = {
+    page: page,
+    limit: limit,
+    total: fieldsQuery.length
+  }
+
+  return {meta, courseData: fieldsQuery};
 
 }
 
@@ -47,25 +114,80 @@ const getSingleCourseFromDB = async(id: string) => {
 const updateCourseIntoDB = async(id: string, payload: Partial<TCourse>) => {
   const {tags, details, ...remainingCourseData} = payload;
 
-  const updatedCourseData : Record<string, unknown> = {...remainingCourseData}
+  const updatedBasicCourseInfo : Record<string, unknown> = {...remainingCourseData}
 
   if(tags && Object.keys(tags).length){
     for(const [key, value] of Object.entries(tags)){
-      updatedCourseData[`tags.${key}`] = value
+      updatedBasicCourseInfo[`tags.${key}`] = value
     }
   }
+
   if(details && Object.keys(details).length){
     for(const [key, value] of Object.entries(details)){
-      updatedCourseData[`tags.${key}`] = value
+      updatedBasicCourseInfo[`details.${key}`] = value
     }
   }
-  const result = await Course.findByIdAndUpdate(
+
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+  const updatedCourseData = await Course.findByIdAndUpdate(
     id,
-    updatedCourseData,
+    updatedBasicCourseInfo,
     {new: true, runValidators: true}
   )
 
-  return result;
+  if (!updatedCourseData) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course!');
+  }
+
+// Check if any tags to update
+  if(tags && tags.length > 0){
+    const deletedTags = tags
+    .filter(tag => tag.name && tag.isDeleted)
+    .map(tag => tag.name)
+
+    const removeDeletedTags = await Course.findByIdAndUpdate(
+      id,
+      {
+        $pull: {tags: { name: { $in: deletedTags}}}
+      },
+      {new: true, runValidators: true}
+    )
+
+    if (!removeDeletedTags) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course!');
+    }
+
+    // add new tags
+    const newTags = tags?.filter(tag => tag.name && !tag.isDeleted)
+
+    const courseWithAddedTags = await Course.findByIdAndUpdate(
+      id,
+      {
+        $addToSet: { tags: { $each: newTags}}
+      },
+      {new: true, runValidators: true}
+    )
+
+    if (!courseWithAddedTags) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course!');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    const result = await Course.findById(id);
+
+    return result;
+  }
+  
+  }catch(err){
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+  }
 }
 
 

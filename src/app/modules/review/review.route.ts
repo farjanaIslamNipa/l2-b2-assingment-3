@@ -11,6 +11,4 @@ router.post(
   ReviewControllers.createReview
 )
 
-router.get('/', ReviewControllers.getAllReview)
-
 export const ReviewRoutes = router

@@ -8,7 +8,8 @@ const router = express.Router()
 router.post(
   '/course', 
   validateRequest(CourseValidation.createCourseValidationSchema), 
-  CourseControllers.createCourse)
+  CourseControllers.createCourse
+  )
 
 router.get('/courses', CourseControllers.getAllCourses)
 router.get('/courses/:courseId', CourseControllers.getSingleCourse)
@@ -16,10 +17,10 @@ router.get('/courses/:courseId', CourseControllers.getSingleCourse)
 router.put(
   '/courses/:courseId',
   validateRequest(CourseValidation.updateCourseValidationSchema),
-  CourseControllers.updateCourse)
+  CourseControllers.updateCourse
+  )
 
 router.get('/courses/:courseId/reviews', CourseControllers.getCourseWithReviews)
-
 router.get('/course/best', CourseControllers.getBestCourse)
  
 export const CourseRoutes = router

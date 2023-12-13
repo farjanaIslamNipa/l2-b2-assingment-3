@@ -18,9 +18,9 @@ export type TCourse = {
   tags: [TTags];
   startDate: string;
   endDate: string;
-  durationInWeeks: number;
   language: string;
   provider: string;
+  durationInWeeks: number;
   details: TDetails;
 }
 

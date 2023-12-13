@@ -1,14 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ErrorRequestHandler } from "express";
-import { TErrorDetails, TErrorSources } from "../interface/error";
+import { TErrorDetails } from "../interface/error";
 import { ZodError } from "zod";
 import handleZodError from "../error/handleZodError";
 import handleValidationError from "../error/handleValidationError";
 import handleCastError from "../error/handleCastError";
 import handleDuplicateError from "../error/handleDuplicateError";
-import { AppError } from "../error/appError";
-import config from "../config";
 
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
@@ -42,21 +40,6 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
      errorMessage = simplifiedError?.errorMessage;
      errorDetails = simplifiedError?.errorDetails;
     }
-  // }else if (err instanceof AppError){
-  //   statusCode = err?.statusCode;
-  //   message =err?.message;
-  //   errorSources = [{
-  //     path: '',
-  //     message: err?.message
-  //   }];
-  // }else if (err instanceof Error){
-  //   message =err?.message;
-  //   errorSources = [{
-  //     path: '',
-  //     message: err?.message
-  //   }];
-  // }
-
 
   return res.status(statusCode).json({
     success: false,
