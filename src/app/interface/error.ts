@@ -1,9 +1,6 @@
-export type TErrorSources = {
-  path: string | number
-  message: string;
-}[]
-
 export type TErrorDetails = Record<string, unknown>
+
+
 export type TGenericErrorResponse = {
   statusCode: number;
   message: string;

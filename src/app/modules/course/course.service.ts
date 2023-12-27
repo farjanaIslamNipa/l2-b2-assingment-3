@@ -36,19 +36,15 @@ const getAllCoursesFromDB = async(query: Record<string, unknown>) => {
 
   excludeFields.forEach(el => delete queryObj[el])
 
-  // FILTERING
+
   const queryNames = Object.keys(queryObj);
+
   // filtering by level
   if(queryNames.includes('level')){
     queryObj['details.level'] = queryObj['level'];
     delete queryObj['level'];
   }
 
-let filterQuery = Course.find(queryObj); 
-
-  if(query.minPrice && query.maxPrice){
-    filterQuery = filterQuery.find()
-  }
 
   // SORTING
   let sortBy = '-createdAt'
@@ -63,50 +59,31 @@ let filterQuery = Course.find(queryObj);
     sortBy = `-${(query.sortBy as string)}`
   }
 
-  const sortQuery = filterQuery.sort(sortBy);
+  // LIMIT AND PAGINATE
+  const limit = Number(query?.limit) || 10
+  const page = Number(query?.page) || 1
+  const skip = ((page - 1) * limit) || 0
 
-// LIMITING
-  let limit = 10
-  if(query.limit){
-    limit = Number(query.limit)
-  }
-
-  // PAGINATING
-  let page =1
-  let skip =0
-
-  if(query.page){
-    page = Number(query.page)
-    skip = (page - 1) * limit
-  }
-
-  const paginateQuery = sortQuery.skip(skip)
-
-  const limitQuery = paginateQuery.limit(limit);
-
+  //  FIELD FILTERING
   let fields= '-__v';
   if(query.fields){
     fields = (query.fields as string).replace(',', ' ')
   }
 
-  const fieldsQuery = await limitQuery.select(fields);
+  const result = await Course.find(queryObj)
+  .populate('createdBy')
+  .sort(sortBy)
+  .skip(skip)
+  .limit(limit)
+  .select(fields)
 
   const meta = {
     page: page,
     limit: limit,
-    total: fieldsQuery.length
+    total: result.length
   }
+  return {meta, courseData: result};
 
-  return {meta, courseData: fieldsQuery};
-
-}
-
-
-// GET SINGLE COURSE
-const getSingleCourseFromDB = async(id: string) => {
-  const result = await Course.findById(id);
-
-  return result;
 }
 
 
@@ -247,7 +224,6 @@ const getBestCourseFromDB = async() => {
 export const CourseServices = {
   createCourseIntoDB,
   getAllCoursesFromDB,
-  getSingleCourseFromDB,
   updateCourseIntoDB,
   getCourseWithReviewsFromDB,
   getBestCourseFromDB

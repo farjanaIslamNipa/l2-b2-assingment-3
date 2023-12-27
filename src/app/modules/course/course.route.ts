@@ -12,7 +12,6 @@ router.post(
   )
 
 router.get('/courses', CourseControllers.getAllCourses)
-router.get('/courses/:courseId', CourseControllers.getSingleCourse)
 
 router.put(
   '/courses/:courseId',

@@ -31,20 +31,6 @@ const getAllCourses = catchAsync(async(req, res) => {
 })
 
 
-// GET SINGLE COURSE
-const getSingleCourse = catchAsync(async(req, res) => {
-  const {courseId} = req.params
-  const result = await CourseServices.getSingleCourseFromDB(courseId);
-
-  sendResponse(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: 'Course retrieved successfully',
-    data: result
-  })
-})
-
-
 // UPDATE COURSE
 const updateCourse = catchAsync(async(req, res) => {
   const { courseId } = req.params
@@ -89,7 +75,6 @@ const getBestCourse = catchAsync(async(req, res) => {
 export const CourseControllers = {
   createCourse,
   getAllCourses,
-  getSingleCourse,
   updateCourse,
   getCourseWithReviews,
   getBestCourse
