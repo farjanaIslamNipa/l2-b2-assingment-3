@@ -10,7 +10,7 @@ app.use(cors());
 app.use('/api', router);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome to level2 batch2 assignment3');
+  res.send('Welcome to level2 batch2 assignment5');
 });
 
 app.use(globalErrorHandler)
