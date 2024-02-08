@@ -12,6 +12,7 @@ router.post(
 )
 
 router.get('/', EventControllers.getEvents)
+router.get('/:id', EventControllers.getSingleEvent)
 
 router.put(
   '/update-event/:id', 

@@ -15,6 +15,13 @@ const getRecentEventsFromDB= async() => {
   return result
 }
 
+const getSingleRecentEventFromDB= async(id: string) => {
+
+  const result = await RecentEvent.findById(id);
+
+  return result
+}
+
 const updateRecentEventIntoDB = async(id:string, payload: Partial<TRecentEvent>) => {
 
   const result = await RecentEvent.findByIdAndUpdate(id, payload, {new: true});
@@ -31,5 +38,6 @@ export const RecentEventServices = {
   createRecentEventIntoDB,
   updateRecentEventIntoDB,
   getRecentEventsFromDB,
+  getSingleRecentEventFromDB,
   deleteRecentEventFromDB
 }

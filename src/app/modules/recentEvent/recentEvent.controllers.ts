@@ -26,6 +26,17 @@ const getRecentEvents = catchAsync(async(req, res) => {
   })
 })
 
+const getSingleRecentEvent = catchAsync(async(req, res) => {
+  const result = await RecentEventServices.getSingleRecentEventFromDB(req.params.id)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Event retrieved successfully',
+    data: result
+  })
+})
+
 const updateRecentEvent = catchAsync(async(req, res) => {
   const result = await RecentEventServices.updateRecentEventIntoDB(req.params.id, req.body)
 
@@ -50,6 +61,7 @@ const deleteRecentEvent = catchAsync(async(req, res) => {
 export const RecentEventControllers = {
   createRecentEvent,
   getRecentEvents,
+  getSingleRecentEvent,
   updateRecentEvent,
   deleteRecentEvent
 }

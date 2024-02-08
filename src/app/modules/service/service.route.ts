@@ -12,6 +12,7 @@ router.post(
 )
 
 router.get('/', ServiceControllers.getServices)
+router.get('/:id', ServiceControllers.getSingleService)
 
 router.put(
   '/update-service/:id', 

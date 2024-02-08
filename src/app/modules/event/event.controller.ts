@@ -26,6 +26,18 @@ const getEvents = catchAsync(async(req, res) => {
   })
 })
 
+const getSingleEvent = catchAsync(async(req, res) => {
+
+  const result = await EventServices.getSingleEventFromDB(req.params.id)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Event retrieved successfully',
+    data: result
+  })
+})
+
 const updateEvent = catchAsync(async(req, res) => {
   const result = await EventServices.updateEventIntoDB(req.params.id, req.body)
 
@@ -50,6 +62,7 @@ const deleteEvent = catchAsync(async(req, res) => {
 export const EventControllers = {
   createEvent,
   getEvents,
+  getSingleEvent,
   updateEvent,
   deleteEvent
 }

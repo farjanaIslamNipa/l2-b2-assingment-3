@@ -26,6 +26,17 @@ const getServices = catchAsync(async(req, res) => {
   })
 })
 
+const getSingleService = catchAsync(async(req, res) => {
+  const result = await ServiceServices.getSingleServiceFromDB(req.params.id)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Service retrieved successfully',
+    data: result
+  })
+})
+
 const updateService = catchAsync(async(req, res) => {
   const result = await ServiceServices.updateServiceIntoDB(req.params.id, req.body)
 
@@ -50,6 +61,7 @@ const deleteService = catchAsync(async(req, res) => {
 export const ServiceControllers = {
   createService,
   getServices,
+  getSingleService,
   updateService,
   deleteService
 }

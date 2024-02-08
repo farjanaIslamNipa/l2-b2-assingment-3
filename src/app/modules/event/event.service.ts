@@ -14,6 +14,13 @@ const getEventsFromDB= async() => {
   return result
 }
 
+const getSingleEventFromDB= async(id : string) => {
+
+  const result = await Event.findById(id);
+
+  return result
+}
+
 const updateEventIntoDB = async(id:string, payload: Partial<TEvent>) => {
 
   const result = await Event.findByIdAndUpdate(id, payload, {new: true});
@@ -30,5 +37,6 @@ export const EventServices = {
   createEventIntoDB,
   updateEventIntoDB,
   getEventsFromDB,
+  getSingleEventFromDB,
   deleteEventFromDB
 }
